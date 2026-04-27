@@ -1,36 +1,36 @@
 require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
-const cloudinary = require('cloudinary').v2;
 
 const app = express();
+app.use(express.json());
+
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
-  channelSecret: process.env.CHANNEL_SECRET
+  channelSecret: process.env.CHANNEL_SECRET,
 };
 
 const client = new line.Client(config);
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
-});
 
-/* ================= MEMORY ================= */
-const groupState = {};
-
+// test route
 app.get('/', (req, res) => {
-  res.status(200).send('OK');
+  res.send('OK');
 });
 
+// webhook
 app.post('/webhook', line.middleware(config), async (req, res) => {
   try {
-    await Promise.all(req.body.events.map(handleEvent));
+    console.log('Webhook received');
     res.sendStatus(200);
   } catch (err) {
-    console.error("❌ webhook error:", err);
+    console.error(err);
     res.sendStatus(500);
   }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Server running on ' + PORT);
 });
 
 /* ================= ฟังก์ชันดึงชื่อโลเคชั่น ================= */
